@@ -31,23 +31,23 @@ Validacija se vrši pomoću anotacija na DTO ([CardApplicantDto](src/main/java/r
 Pretvorba između DTO i Entity beansa vrši se u ([Controlleru](src/main/java/rba/zadatak/Controller.java)) pomoću MapStruct knjižnice kako bi se izbjegao boilerplate kod. Lombok knjižnica koristi se za automatsko generiranje getter i setter metoda. 
 
 
-##Izolacija u kontekstu paralelnog korištenja
+## Izolacija u kontekstu paralelnog korištenja
 
 Java Servleti stvaraju novi thread za svaki HTTP request u obradi. To dovodi do paralelnog pristupanja i mijenjanja podataka što može utjecati na valjanost programa.
 Kako bi se osigurala sinkronizacija threadova, aplikacijska logika koristi lockove iz RDBMS-a čime se sprječava da različiti threadovi istovremeno pristupaju istom Entityu ako je u tijeku operacija koja bi mogla ugroziti konzistentnost podataka. Lockovi se koriste tako da je se u [JPA repozitoriju](src/main/java/rba/zadatak/repository/JPARepositoryFragment.java) postavljaju anotacije na metode kojima se dohvaća Entity iz baze podataka.
 
 Kako bi se spriječio racing uvjet u slučaju stvaranja resursa pomoću HTTP POST metode (kada u bazi ne postoji Entity koji se može iskoristiti kao lock), implementirana je mapa objekata za sinkronizaciju threadova u [Service klasi](src/main/java/rba/zadatak/service/CardApplicantServiceImpl.java).
 
-##Transakcije
+## Transakcije
 Osim što pomažu sinkronizaciji pristupa podacima, transakcije su važna jer određuju rollback točke. U slučaju jedinstvenog Data Sourcea (npr relacijske baze) dovoljno je anotirati metode s @Transactional anotacijom i framework će automatski rollbackat sve promjene u bazi ako metoda rezultira *unchecked exceptionom*.
 
 U ovom zadatku postoje dva Data Sourcea: embedded H2 baza podataka i disk na kojem se spremaju datoteke. Prilikom izvođenja transakcija važno je voditi računa da se u slučaju greške promjene ne rollbackaju samo u relacijskoj bazi već i na disku.
 
 
-##Logging
+## Logging
 
 Spring Boot već sadrži defaultni logger koji je iskorišten za zapisivanje edge case scenarija u posebnu datoteku. [logback.xml](/src/main/resources/logback.xml)
 
 
-##Testovi
+## Testovi
 Testovi su implementirani pomoću JUnit frameworka i koriste @SpringBootTest anotaciju koja omogućuje testiranje čitave aplikacije. U [ControllerTest](src/test/java/rba/zadatak/ControllerTest.java) klasi nalaze se testovi CRUD operacija definiranih u kontroleru. [InputValidationTest](src/test/java/rba/zadatak/InputValidationTest.java) sadrži testove za ulazne podatke koji se dobivaju JSON deserijalizacijom. [FileRepositoryTest](src/test/java/rba/zadatak/FileRepositoryTest.java) sadrži testove za upravljanje datotekama u koje se spremaju Entity objekti.
