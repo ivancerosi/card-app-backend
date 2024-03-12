@@ -39,7 +39,7 @@ Kako bi se osigurala sinkronizacija threadova, aplikacijska logika koristi locko
 Kako bi se spriječio racing uvjet u slučaju stvaranja resursa pomoću HTTP POST metode (kada u bazi ne postoji Entity koji se može iskoristiti kao lock), implementirana je mapa objekata za sinkronizaciju threadova u [Service klasi](src/main/java/rba/zadatak/service/CardApplicantServiceImpl.java).
 
 ## Transakcije
-Osim što pomažu sinkronizaciji pristupa podacima, transakcije su važna jer određuju rollback točke. U slučaju jedinstvenog Data Sourcea (npr relacijske baze) dovoljno je anotirati metode s @Transactional anotacijom i framework će automatski rollbackat sve promjene u bazi ako metoda rezultira *unchecked exceptionom*.
+Osim što pomažu sinkronizaciji pristupa podacima, transakcije određuju rollback točke. U slučaju jedinstvenog Data Sourcea (npr relacijske baze) dovoljno je anotirati metode s @Transactional anotacijom i framework će automatski rollbackat sve promjene u bazi ako metoda rezultira *unchecked exceptionom*.
 
 U ovom zadatku postoje dva Data Sourcea: embedded H2 baza podataka i disk na kojem se spremaju datoteke. Prilikom izvođenja transakcija važno je voditi računa da se u slučaju greške promjene ne rollbackaju samo u relacijskoj bazi već i na disku.
 
