@@ -15,7 +15,9 @@ public interface CardRepository {
     Optional<CardApplicant> findByIdPessimisticRead(String pin);
     Boolean existsById(String s);
     void deleteById(String s);
+
     CardApplicant readFile(File file);
     File writeFile(CardApplicant entity);
     CardApplicant updateFile(CardApplicant entity, File file);
+    void deleteFile(File file);
 }

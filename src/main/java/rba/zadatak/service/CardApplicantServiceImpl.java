@@ -42,24 +42,6 @@ public class CardApplicantServiceImpl implements CardApplicantService {
     }
 
 
-    private void rollbackFileCreation(String filename, CardApplicant applicant) {
-        CardApplicant read;
-
-        if (applicant.getStatus()==CardStatus.DELETED || applicant.getStatus()==CardStatus.OUTDATED) {
-            // ovo se ne bi smjelo dogoditi jer CardApplicant s ovim statusom izbrisan je iz baze
-            logger.warn("Unexpected file rollback invoked on CardApplicant",applicant.toString());
-        }
-
-        try {
-            cardRepository.updateFile(applicant, new File(filename));
-        } catch (Exception e) {
-            logger.error("File rollback failed for file {} and CardStatus {}",filename, applicant.getStatus());
-            logger.error("Exception:",e);
-            return;
-        }
-
-    }
-
     // vraca korisnika i istovremeno stvara tekstualnu datoteku
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -93,9 +75,14 @@ public class CardApplicantServiceImpl implements CardApplicantService {
                     case PENDING:
                         applicant.get().setStatus(CardStatus.ACCEPTED);
                         String filename = cardRepository.writeFile(applicant.get()).getName();
-                        applicant.get().setFilename(filename);
-                        cardRepository.save(applicant.get());
-                        //handlePendingApplicant(applicant.get());
+                        try {
+                            applicant.get().setFilename(filename);
+                            cardRepository.save(applicant.get());
+                        }
+                        catch (RuntimeException e) {
+                            // file rollback ako upis u bazu ne uspije
+                            cardRepository.deleteFile(new File(filename));
+                        }
 
                         break;
 
@@ -203,8 +190,17 @@ public class CardApplicantServiceImpl implements CardApplicantService {
                             "text file is missing", CardStatus.ACCEPTED));
                 }
                 // ako se prethodne provjere prosle... promijeni entity record u bazi i oznaci datoteku kao neaktivnu
+                CardStatus prevStatus = found.get().getStatus();
                 found.get().setStatus(CardStatus.OUTDATED);
                 cardRepository.updateFile(found.get(), new File(found.get().getFilename()));
+
+                try {
+                    applicant = cardRepository.save(applicant);
+                } catch (RuntimeException e) {
+                    // rollback file
+                    found.get().setStatus(prevStatus);
+                    cardRepository.updateFile(found.get(), new File(found.get().getFilename()));
+                }
                 return cardRepository.save(applicant);
             default:
                 // ovo se ne bi smjelo dogoditi

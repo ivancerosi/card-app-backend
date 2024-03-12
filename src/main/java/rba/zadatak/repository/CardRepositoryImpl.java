@@ -71,4 +71,9 @@ public class CardRepositoryImpl implements CardRepository {
     public CardApplicant updateFile(CardApplicant entity, File file) {
         return fileRepositoryFragment.updateFile(entity, file);
     }
+
+    @Override
+    public void deleteFile(File file) {
+        fileRepositoryFragment.deleteFile(file);
+    }
 }
