@@ -34,7 +34,7 @@ Pretvorba između DTO i Entity beansa vrši se u ([Controlleru](src/main/java/rb
 ## Izolacija u kontekstu paralelnog korištenja
 
 Java Servleti stvaraju novi thread za svaki HTTP request u obradi. To dovodi do paralelnog pristupanja i mijenjanja podataka što može utjecati na valjanost programa.
-Kako bi se osigurala sinkronizacija threadova, aplikacijska logika koristi lockove iz RDBMS-a čime se sprječava da različiti threadovi istovremeno pristupaju istom Entityu ako je u tijeku operacija koja bi mogla ugroziti konzistentnost podataka. Lockovi se koriste tako da je se u [JPA repozitoriju](src/main/java/rba/zadatak/repository/JPARepositoryFragment.java) postavljaju anotacije na metode kojima se dohvaća Entity iz baze podataka.
+Kako bi se osigurala sinkronizacija threadova, aplikacijska logika koristi lockove iz RDBMS-a čime se sprječava da različiti threadovi istovremeno pristupaju istom Entityu ako je u tijeku operacija koja bi mogla ugroziti konzistentnost podataka. Lockovi se koriste postavljanjem anotacija u [JPA repozitoriju](src/main/java/rba/zadatak/repository/JPARepositoryFragment.java) na metode kojima se dohvaća Entity iz baze podataka.
 
 Kako bi se spriječio racing uvjet u slučaju stvaranja resursa pomoću HTTP POST metode (kada u bazi ne postoji Entity koji se može iskoristiti kao lock), implementirana je mapa objekata za sinkronizaciju threadova u [Service klasi](src/main/java/rba/zadatak/service/CardApplicantServiceImpl.java).
 
