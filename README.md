@@ -4,7 +4,7 @@ Projekt je napravljen pomoću Spring Boot frameworka i razdijeljen na tri standa
 - Application logic ([Service](src/main/java/rba/zadatak/service/CardApplicantServiceImpl.java))
 - Data layer ([Repository](src/main/java/rba/zadatak/repository/CardRepositoryImpl.java),[File repository fragment](src/main/java/rba/zadatak/repository/FileRepositoryFragmentImpl.java),[JPA repository fragment](src/main/java/rba/zadatak/repository/JPARepositoryFragment.java))
 
-[Controller](src/main/java/rba/zadatak/Controller.java) nudi 3 endpointa:
+[Controller](src/main/java/rba/zadatak/Controller.java) nudi 4 endpointa:
 - /api/save **POST**
 - /api/find/{id} **GET**
 - /api/edit **PUT**
@@ -14,7 +14,7 @@ Kontroler očekuje sljedeći JSON objekt { firstName:**string**, lastName:**stri
 
 Polje *status* se ignorira prilikom deserijalizacije jer njime upravlja aplikacija, ali vraća se prilikom serijalizacije kao odgovor u  /api/find/{id} endpointu.
 
-*Status* status je enum koji  može imati sljedeće vrijednosti: *PENDING*, *ACCEPTED*, *OUTDATED*, *DELETED*
+*Status* je enum koji  može imati sljedeće vrijednosti: *PENDING*, *ACCEPTED*, *OUTDATED*, *DELETED*
 
 - *PENDING* označava stanje da je zahtjev za izradom kartice predan pomoću **/save** endpointa, ali još nije generirana tekstualna datoteka.
 - *ACCEPTED* označava stanje da je zahtjev prihvaćen (pozivanjem **/find/{pin}** endpointa) za izradu i generirana je tekstualna datoteka na disku.
